@@ -1,2 +1,2 @@
-# ApolloPy
+# ApolloBotPy
 Python version of ApolloBot
