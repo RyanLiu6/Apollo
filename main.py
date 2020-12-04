@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from settings import TOKEN, PREFIX
-from commands.secret_santa import get_secret_santas
+from commands.secret_santa import make_secret_santas, get_secret_santa
 
 bot = commands.Bot(command_prefix=PREFIX)
 
@@ -17,7 +17,8 @@ async def secret_santa(ctx):
     for item in mentions:
         members[item.name] = item.id
 
-    secret_santas = get_secret_santas()
+    # secret_santas = make_secret_santas()
+    secret_santas = get_secret_santa(year=2020)
 
     names = secret_santas.get_names()
 

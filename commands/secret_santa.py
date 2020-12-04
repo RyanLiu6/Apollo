@@ -5,7 +5,7 @@ import datetime
 
 from models.secret_santa import Santa, SecretSantas
 
-def get_secret_santas():
+def make_secret_santas():
     # Load previous year's secret santa
     current_year = datetime.datetime.now().year
 
@@ -64,3 +64,22 @@ def get_secret_santas():
         json.dump(data, write_file, indent=4)
 
     return this_santas
+
+def get_secret_santa(year):
+    with open("previous_years.json") as read_file:
+        data = json.load(read_file)
+
+    year_data = data[str(year)]
+    santas = SecretSantas()
+
+    for k, v in enumerate(year_data):
+        if k < len(year_data) - 1:
+            index = k + 1
+        else:
+            index = 0
+
+        santas.add_santa(Santa(
+            name=v,
+            recipient=year_data[index]))
+
+    return santas
