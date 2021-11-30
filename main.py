@@ -66,6 +66,6 @@ async def secret_santa(ctx):
 
         logging.getLogger("Discord").debug(f"{name}, {message}")
 
-        await user.send()
+        await user.send(message)
 
 bot.run(TOKEN)
