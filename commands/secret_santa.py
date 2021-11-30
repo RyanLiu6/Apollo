@@ -1,6 +1,7 @@
 import copy
 import json
 import random
+import logging
 import datetime
 
 from models.secret_santa import Santa, SecretSantas
@@ -12,58 +13,28 @@ def make_secret_santas():
     with open("previous_years.json") as read_file:
         data = json.load(read_file)
 
-    previous_year = data[str(current_year - 1)]
+    previous_data = data[str(current_year - 1)]
 
-    previous_santas = SecretSantas()
+    previous_santas = assemble_santas(previous_data)
+    current_data = copy.deepcopy(previous_data)
+    random.shuffle(current_data)
+    current_santas = assemble_santas(current_data)
 
-    for k, v in enumerate(previous_year):
-        if k < len(previous_year) - 1:
-            index = k + 1
-        else:
-            index = 0
-
-        previous_santas.add_santa(Santa(
-            name=v,
-            recipient=previous_year[index]))
-
-    this_year = copy.deepcopy(previous_year)
-    random.shuffle(this_year)
-
-    this_santas = SecretSantas()
-    for k, v in enumerate(this_year):
-        if k < len(this_year) - 1:
-            index = k + 1
-        else:
-            index = 0
-
-        # Need to redo if previous and current years are the same
-        name = v
-        current = this_year[index]
-        previous = previous_santas.get_santa(name).recipient
-
-        if current == previous:
-            no_nos = [k, index]
-            rand_int = -1
-            while not rand_int in no_nos:
-                rand_int = random.randint(0, len(this_year))
-
-            current = this_year[rand_int]
-
-        this_santas.add_santa(Santa(
-            name=name,
-            recipient=current))
+    while not validate_santas(previous_santas, current_santas):
+        random.shuffle(current_data)
+        current_santas = assemble_santas(current_data)
 
     # Store it in the json file
-    this_year_json = []
-    for k, v in this_santas.santas.items():
-        this_year_json.append(v.name)
+    current_year_json = []
+    for k, v in current_santas.santas.items():
+        current_year_json.append(v.name)
 
-    data[str(current_year)] = this_year_json
+    data[str(current_year)] = current_year_json
 
     with open("previous_years.json", "w") as write_file:
         json.dump(data, write_file, indent=4)
 
-    return this_santas
+    return current_santas
 
 def get_secret_santa(year):
     with open("previous_years.json") as read_file:
@@ -81,5 +52,30 @@ def get_secret_santa(year):
         santas.add_santa(Santa(
             name=v,
             recipient=year_data[index]))
+
+    return santas
+
+def validate_santas(previous, current):
+    logging.getLogger("Discord").debug(f"Previous: \n{previous}")
+    logging.getLogger("Discord").debug(f"Current: \n{current}")
+
+    for name in current.get_names():
+        if current.get_santa(name) == previous.get_santa(name):
+            return False
+
+    return True
+
+def assemble_santas(input_list):
+    santas = SecretSantas()
+
+    for key, name in enumerate(input_list):
+        if key < len(input_list) - 1:
+            index = key + 1
+        else:
+            index = 0
+
+        santas.add_santa(Santa(
+            name=name,
+            recipient=input_list[index]))
 
     return santas

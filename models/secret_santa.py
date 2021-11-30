@@ -3,6 +3,9 @@ class Santa:
         self.name = name
         self.recipient = recipient
 
+    def __eq__(self, other):
+        return self.name == other.name and self.recipient == other.recipient
+
 class SecretSantas:
     def __init__(self):
         self.santas = {}
