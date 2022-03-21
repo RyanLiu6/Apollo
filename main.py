@@ -2,23 +2,22 @@ import logging
 
 from discord.ext import commands
 
-from settings import TOKEN, PREFIX
-from commands.secret_santa import make_secret_santas, get_secret_santa
+from settings import DISCORD_TOKEN, DISCORD_PREFIX
+# from commands.secret_santa import make_secret_santas, get_secret_santa
+from commands.spotify import SpotifyCommands
 
 logging.basicConfig(level=logging.WARNING, format='%(message)s')
 logger = logging.getLogger("Discord")
 logger.setLevel(logging.WARNING)
 
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=DISCORD_PREFIX)
+
+@bot.event
+async def on_ready():
+    print("Ready!")
 
 @bot.command(name="test")
 async def test(ctx):
-    logging.getLogger("Discord").info("INFO")
-    logging.getLogger("Discord").debug("DEBUG")
-    logging.getLogger("Discord").warning("WARN")
-
-    logging.getLogger("Discord").warning(logging.getLogger("Discord").level)
-
     await ctx.send("Testing")
 
 @bot.command(name="set_log_level")
@@ -45,27 +44,36 @@ async def set_log_level(ctx):
 
     logging.getLogger("Discord").warning(logging.getLogger("Discord").level)
 
-@bot.command(name="secret_santa")
-async def secret_santa(ctx):
-    members = {}
-    for item in ctx.message.mentions:
-        members[item.name] = item.id
+# @bot.command(name="secret_santa")
+# async def secret_santa(ctx):
+#     members = {}
+#     for item in ctx.message.mentions:
+#         members[item.name] = item.id
 
-    secret_santas = make_secret_santas()
-    secret_santas = get_secret_santa(year=2021)
+#     secret_santas = make_secret_santas()
+#     secret_santas = get_secret_santa(year=2021)
 
-    names = secret_santas.get_names()
+#     names = secret_santas.get_names()
 
-    for name in names:
-        uid = members[name]
-        user = bot.get_user(uid)
+#     for name in names:
+#         uid = members[name]
+#         user = bot.get_user(uid)
 
-        recipient = secret_santas.get_santa(name).recipient
+#         recipient = secret_santas.get_santa(name).recipient
 
-        message = f"You are the Secret Santa to: {recipient}"
+#         message = f"You are the Secret Santa to: {recipient}"
 
-        logging.getLogger("Discord").debug(f"{name}, {message}")
+#         logging.getLogger("Discord").debug(f"{name}, {message}")
 
-        await user.send(message)
+#         await user.send(message)
 
-bot.run(TOKEN)
+@bot.command(name="get_track")
+async def get_track(ctx):
+    spotify = SpotifyCommands()
+    spotify.get_track()
+
+
+@bot.command()
+
+if __name__ == "__main__":
+    bot.run(DISCORD_TOKEN)

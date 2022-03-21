@@ -4,7 +4,80 @@ import random
 import logging
 import datetime
 
-from models.secret_santa import Santa, SecretSantas
+
+# class Santa:
+#     def __init__(self, name, recipient):
+#         self.name = name
+#         self.recipient = recipient
+
+#     def __eq__(self, other):
+#         return self.name == other.name and self.recipient == other.recipient
+
+
+# class SecretSantas:
+#     def __init__(self):
+#         self.santas = {}
+
+#     def add_santa(self, santa):
+#         self.santas[santa.name] = santa
+
+#     def get_santa(self, name):
+#         return self.santas[name]
+
+#     def get_names(self):
+#         return self.santas.keys()
+
+#     def __str__(self):
+#         to_return = ""
+#         for k, v in self.santas.items():
+#             to_return += f"Name: {k} | Recipient: {v.recipient}\n"
+
+#         return to_return
+
+class Santa:
+    def __init__(self):
+        self.santas = {}
+
+    def add_santa(self, gift_giver, gift_receiver):
+        self.santas[gift_giver] = gift_receiver
+
+    def get_receiver(self, gift_giver):
+        return self.santas[gift_giver]
+
+    def get_givers(self):
+        return self.santas.keys()
+
+    def get_receivers(self):
+        return self.santas.values()
+
+    def __str__(self):
+        to_return = ""
+        for k, v in self.santas.items():
+            to_return += f"Name: {k} | Recipient: {v.recipient}\n"
+
+        return to_return
+
+
+class SecretSanta:
+    def get_secret_santa_by_year(year):
+        with open("previous_years.json") as read_file:
+            data = json.load(read_file)
+
+        year_data = data[str(year)]
+        santas = SecretSantas()
+
+        for k, v in enumerate(year_data):
+            if k < len(year_data) - 1:
+                index = k + 1
+            else:
+                index = 0
+
+            santas.add_santa(Santa(
+                name=v,
+                recipient=year_data[index]))
+
+        return santas
+
 
 def make_secret_santas():
     # Load previous year's secret santa
@@ -36,25 +109,6 @@ def make_secret_santas():
 
     return current_santas
 
-def get_secret_santa(year):
-    with open("previous_years.json") as read_file:
-        data = json.load(read_file)
-
-    year_data = data[str(year)]
-    santas = SecretSantas()
-
-    for k, v in enumerate(year_data):
-        if k < len(year_data) - 1:
-            index = k + 1
-        else:
-            index = 0
-
-        santas.add_santa(Santa(
-            name=v,
-            recipient=year_data[index]))
-
-    return santas
-
 def validate_santas(previous, current):
     logging.getLogger("Discord").debug(f"Previous: \n{previous}")
     logging.getLogger("Discord").debug(f"Current: \n{current}")
@@ -79,3 +133,4 @@ def assemble_santas(input_list):
             recipient=input_list[index]))
 
     return santas
+
