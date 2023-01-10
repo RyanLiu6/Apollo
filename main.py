@@ -1,79 +1,53 @@
+#!/usr/bin/env python3
+
+import discord
 import logging
 
 from discord.ext import commands
+from settings import DISCORD_PREFIX, DISCORD_TOKEN
 
-from settings import DISCORD_TOKEN, DISCORD_PREFIX
-# from commands.secret_santa import make_secret_santas, get_secret_santa
-from commands.spotify import SpotifyCommands
 
-logging.basicConfig(level=logging.WARNING, format='%(message)s')
-logger = logging.getLogger("Discord")
-logger.setLevel(logging.WARNING)
+apollo_bot = commands.Bot(command_prefix=DISCORD_PREFIX)
 
-bot = commands.Bot(command_prefix=DISCORD_PREFIX)
 
-@bot.event
+@apollo_bot.event
 async def on_ready():
-    print("Ready!")
+    print("ApolloBot is ready!")
 
-@bot.command(name="test")
+
+@apollo_bot.command(name="test")
 async def test(ctx):
-    await ctx.send("Testing")
+    await ctx.send("Testing :woozy_face:")
 
-@bot.command(name="set_log_level")
+
+@apollo_bot.command(name="ping")
+async def pong(ctx):
+    await ctx.send("pong")
+
+
+@apollo_bot.command(name="set_log_level")
 async def set_log_level(ctx):
-    options = ["INFO", "DEBUG", "WARN"]
+    options = {
+        "INFO": logging.INFO,
+        "DEBUG": logging.DEBUG,
+        "WARN": logging.WARN,
+    }
 
     channel = ctx.message.channel
     content = ctx.message.content.split()
 
     if len(content) < 2:
-        await channel.send(f"Malformed request, log level must be one of {options}")
+        await channel.send(f"Malformed request, log level must be one of {options.keys}")
 
-    if content[1] not in options:
-        await channel.send(f"Malformed request, log level must be one of {options}")
+    desired_log_level = content[1]
+    if desired_log_level not in options.keys:
+        await channel.send(f"Malformed request, log level must be one of {options.keys}")
     else:
-        if content[1] == options[0]:
-            logging.getLogger("Discord").setLevel(logging.INFO)
-        elif content[1] == options[1]:
-            logging.getLogger("Discord").setLevel(logging.DEBUG)
-        else:
-            logging.getLogger("Discord").setLevel(logging.WARNING)
+        discord.utils.setup_logging(level=options[desired_log_level], root=False)
 
-        await channel.send(f"Log level set to {content[1]}")
+        await channel.send(f"Log level set to {desired_log_level}")
 
-    logging.getLogger("Discord").warning(logging.getLogger("Discord").level)
-
-# @bot.command(name="secret_santa")
-# async def secret_santa(ctx):
-#     members = {}
-#     for item in ctx.message.mentions:
-#         members[item.name] = item.id
-
-#     secret_santas = make_secret_santas()
-#     secret_santas = get_secret_santa(year=2021)
-
-#     names = secret_santas.get_names()
-
-#     for name in names:
-#         uid = members[name]
-#         user = bot.get_user(uid)
-
-#         recipient = secret_santas.get_santa(name).recipient
-
-#         message = f"You are the Secret Santa to: {recipient}"
-
-#         logging.getLogger("Discord").debug(f"{name}, {message}")
-
-#         await user.send(message)
-
-@bot.command(name="get_track")
-async def get_track(ctx):
-    spotify = SpotifyCommands()
-    spotify.get_track()
-
-
-@bot.command()
 
 if __name__ == "__main__":
-    bot.run(DISCORD_TOKEN)
+    discord.utils.setup_logging(level=logging.INFO, root=False)
+    apollo_bot.run(DISCORD_TOKEN)
