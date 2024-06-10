@@ -1,0 +1,25 @@
+{
+  "name": "apollo",
+  "version": "1.0.0",
+  "description": "Apollo is a custom Bot that monitors a home multi-media server and serve a collection of random functions.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx eslint .",
+    "start": "node ."
+  },
+  "keywords": [],
+  "author": "RyanLiu6",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^20.14.2",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.13.0"
+  }
+}
