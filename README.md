@@ -1,4 +1,4 @@
-# ApolloBot
+# Apollo
 A Discord bot written in Python. Currently supports monitoring subreddits and posting new posts to configured channels.
 
 ## Features
