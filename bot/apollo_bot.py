@@ -1,8 +1,9 @@
 import discord
+
 from discord.ext import commands
 
 from settings import DISCORD_PREFIX
-from commands import Misc
+from commands import Misc, Reddit
 
 class ApolloBot(commands.Bot):
     def __init__(self):
@@ -23,3 +24,4 @@ class ApolloBot(commands.Bot):
         This is where we load our cogs and perform any necessary async initialization.
         """
         await self.add_cog(Misc(self))
+        await self.add_cog(Reddit(self))
