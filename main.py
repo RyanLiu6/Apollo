@@ -1,13 +1,34 @@
 #!/usr/bin/env python3
 
-from settings import DISCORD_TOKEN
+import os
+import threading
+
+from flask import Flask
+
 from bot import ApolloBot
 from utils import setup_logging
+from settings import DISCORD_TOKEN
+
+# Create Flask app for health check
+app = Flask(__name__)
+
+@app.route('/')
+def health_check():
+    return 'Bot is running!', 200
+
+def run_flask():
+    # Get port from environment variable or default to 8080
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port)
 
 if __name__ == "__main__":
     # Configure logging first
     setup_logging()
-    
+
+    # Start Flask in a separate thread
+    flask_thread = threading.Thread(target=run_flask, daemon=True)
+    flask_thread.start()
+
     # Create and run the bot
     apollo_bot = ApolloBot()
     apollo_bot.run(DISCORD_TOKEN)
