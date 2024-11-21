@@ -12,7 +12,7 @@ from settings import DISCORD_TOKEN
 # Create Flask app for health check
 app = Flask(__name__)
 
-@app.route('/')
+@app.route("/health_check")
 def health_check():
     return 'Bot is running!', 200
 
