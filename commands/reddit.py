@@ -24,7 +24,7 @@ class Reddit(commands.Cog):
         self.bot = bot
         self.reddit = None
         self.configs = {}
-        self.start_time = datetime.utcnow()
+        self.time_threshold = datetime.utcnow()
 
         self._setup_reddit_client()
         self.monitor_task = self.monitor_subreddits.start()
@@ -270,6 +270,9 @@ class Reddit(commands.Cog):
         Only posts newer than when the bot started will be processed.
         """
         try:
+            # First, update time
+            self.time_threshold = datetime.utcnow()
+
             for guild_id, guild_config in self.configs.items():
                 for channel_id, config in guild_config.get("channel_configs", {}).items():
                     subreddit = config["subreddit"]
@@ -286,7 +289,7 @@ class Reddit(commands.Cog):
                         async for submission in subreddit_instance.new(limit=5):
                             # Only process posts newer than when the bot started
                             submission_time = datetime.utcfromtimestamp(submission.created_utc)
-                            if submission_time <= self.start_time:
+                            if submission_time <= self.time_threshold:
                                 continue
 
                             # Check if post matches any filters
